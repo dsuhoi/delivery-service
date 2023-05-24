@@ -1,6 +1,7 @@
 import random
 
 import sqlalchemy as sa
+from geopy.distance import distance as geodist
 
 from .database import Base
 
@@ -16,6 +17,13 @@ class Cargo(Base):
     )
     weight = sa.Column(sa.Integer, nullable=False)
     description = sa.Column(sa.Text, nullable=False)
+
+    pick_up_loc = sa.orm.relationship(
+        "Location", foreign_keys=[pick_up], lazy="selectin"
+    )
+    delivery_loc = sa.orm.relationship(
+        "Location", foreign_keys=[delivery], lazy="selectin"
+    )
 
     def __str__(self):
         return f"id={self.id} # weight={self.weight} # delivery={self.delivery}"
@@ -41,6 +49,8 @@ class Car(Base):
         sa.Integer, nullable=False, default=lambda: random.randint(1, 1000)
     )
 
+    loc = sa.orm.relationship("Location", foreign_keys=[current_loc], lazy="selectin")
+
     def __str__(self):
         return f"id={self.id} # car_number={self.car_number} # location={self.location}"
 
@@ -53,6 +63,13 @@ class Location(Base):
     state_name = sa.Column(sa.Text, nullable=False)
     lat = sa.Column(sa.Float, nullable=False)
     lng = sa.Column(sa.Float, nullable=False)
+
+    @property
+    def coords(self) -> (float, float):
+        return (self.lat, self.lng)
+
+    def distance(self, loc: "Location") -> float:
+        return round(geodist(self.coords, loc.coords).miles, 4)
 
     def __str__(self):
         return f"zip[{self.lat}, {self.lng}]: {self.zip} # {self.city}"
