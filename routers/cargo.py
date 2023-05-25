@@ -97,7 +97,7 @@ async def get_cargo(
         pick_up=cargo.pick_up,
         delivery=cargo.delivery,
         weight=cargo.weight,
-        description=car.description,
+        description=cargo.description,
         cars=cars,
     )
 
