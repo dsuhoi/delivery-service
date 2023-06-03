@@ -80,3 +80,14 @@ async def test_get_cargo(ac, create_data):
     response = await ac.get("cargo/1")
     assert response.status_code == 200
     assert response.json()["id"] == 1
+
+
+async def test_update_cargo(ac, create_data):
+    response = await ac.patch("cargo/", params={"cargo_id": 1}, json={"weight": 100})
+    assert response.status_code == 200
+    assert response.json()["weight"] == 100
+
+
+async def test_delete_cargo(ac, create_data):
+    response = await ac.delete("cargo/1")
+    assert response.status_code == 200
