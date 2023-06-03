@@ -1,13 +1,16 @@
+import logging
 from typing import Annotated
 
 import core.models as models
 import core.schemas as schemas
 from core.database import get_session
-from core.model_utils import get_all, get_by_id, get_zip_codes
+from core.model_utils import (create_model, delete_model, get_all, get_by_id,
+                              get_zip_codes)
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/cargo", tags=["cargo"])
+# logger = logging.getLogger(__name__)
 
 
 async def get_id_cargo(cargo_id: int, db: AsyncSession = Depends(get_session)):
@@ -27,9 +30,7 @@ async def create_cargo(
             detail="There are no zip codes for 'pick_up' or 'delivery' in the database.",
         )
     db_cargo = models.Cargo(**cargo.dict())
-    db.add(db_cargo)
-    print(db_cargo)
-    await db.commit()
+    await create_model(db, db_cargo)
     return db_cargo
 
 
@@ -124,6 +125,5 @@ async def update_cargo(
 async def delete_cargo(
     cargo: models.Cargo = Depends(get_id_cargo), db: AsyncSession = Depends(get_session)
 ):
-    await db.delete(cargo)
-    await db.commit()
+    await delete_model(db, cargo)
     return {"detail": "Cargo deleted"}

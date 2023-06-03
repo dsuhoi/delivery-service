@@ -28,3 +28,13 @@ async def update_cars_position_random():
     )
     async with engine.begin() as conn:
         await conn.execute(query)
+
+
+async def create_model(db: AsyncSession, model: Base):
+    db.add(model)
+    await db.commit()
+
+
+async def delete_model(db: AsyncSession, model: Base):
+    await db.delete(model)
+    await db.commit()

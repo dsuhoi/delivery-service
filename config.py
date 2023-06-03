@@ -10,10 +10,13 @@ class Settings(BaseSettings):
     DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
     DB_HOST = os.environ.get("DB_HOST", "localhost")
     DB_PORT = os.environ.get("DB_PORT", 5432)
-    SQLALCHEMY_DATABASE_URL: str = (
-        f"postgresql+asyncpg://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}"
-    )
 
+    DB_DATABASE_TEST = os.environ.get("DB_DATABASE", "delivery-service-test")
+    DB_HOST_TEST = os.environ.get("DB_HOST", "localhost")
+    DB_PORT_TEST = os.environ.get("DB_PORT", 5432)
+
+    SQLALCHEMY_DATABASE_URL: str = f"postgresql+asyncpg://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}"
+    SQLALCHEMY_DATABASE_TEST_URL: str = f"postgresql+asyncpg://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_DATABASE_TEST}"
     LOGGING_CONFIG = {
         "version": 1,
         "disable_existing_loggers": True,
