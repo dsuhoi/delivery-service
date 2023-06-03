@@ -1,4 +1,3 @@
-import logging
 from typing import Annotated
 
 import core.models as models
@@ -10,7 +9,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/cargo", tags=["cargo"])
-# logger = logging.getLogger(__name__)
 
 
 async def get_id_cargo(cargo_id: int, db: AsyncSession = Depends(get_session)):

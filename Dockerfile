@@ -4,9 +4,10 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y libpq-dev netcat
 
-COPY *.py requirements.txt ./
+COPY *.py pytest.ini requirements.txt ./
 COPY core/ ./core/
 COPY routers/ ./routers/
+COPY tests/ ./tests/
 
 RUN pip3 install -r requirements.txt
 

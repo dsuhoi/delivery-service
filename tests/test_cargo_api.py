@@ -60,3 +60,23 @@ async def test_list_cargo(ac, create_data):
         "id": 1,
         "pick_up": 12933,
     }
+
+
+async def test_post_cargo(ac, create_data):
+    response = await ac.post(
+        "cargo/",
+        json={
+            "pick_up": 39092,
+            "delivery": 15951,
+            "weight": 500,
+            "description": "Text4",
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["id"]
+
+
+async def test_get_cargo(ac, create_data):
+    response = await ac.get("cargo/1")
+    assert response.status_code == 200
+    assert response.json()["id"] == 1
