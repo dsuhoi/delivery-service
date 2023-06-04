@@ -3,7 +3,7 @@ from typing import Annotated
 import core.models as models
 import core.schemas as schemas
 from core.database import get_session
-from core.model_utils import get_all, get_by_id, get_zip_codes
+from core.model_utils import create_model, get_all, get_by_id, get_zip_codes
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -32,8 +32,7 @@ async def create_car(
             detail="There are no zip codes for 'pick_up' or 'delivery' in the database.",
         )
     car = models.Car(current_loc=start_location)
-    db.add(car)
-    await db.commit()
+    await create_model(db, car)
     return car
 
 
@@ -58,5 +57,7 @@ async def update_car(
 ):
     if car.current_loc and (car.current_loc in await get_zip_codes(db)):
         car_db.current_loc = car.current_loc
+    if car.load_capacity:
+        car_db.load_capacity = car.load_capacity
     await db.commit()
     return car_db
