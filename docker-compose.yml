@@ -6,6 +6,8 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     expose:
       - ${DB_HOST}
+    networks:
+      - transformer
     environment:
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
@@ -18,12 +20,26 @@ services:
     volumes:
       - .:/app
     ports:
-      - 8000:8000
+      - 8001:8000
+    networks:
+      - transformer
     environment:
       - DATABASE_URL=postgresql+asyncpg://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_HOST}/${DB_DATABASE}
     env_file:
       - ./.env
     depends_on:
       - db
+  frontend:
+    build: ./frontend
+    ports:
+      - 3001:3000
+    networks:
+      - transformer
+    env_file:
+      - ./.env
 volumes:
   postgres_data:
+
+networks:
+  transformer:
+    driver: bridge

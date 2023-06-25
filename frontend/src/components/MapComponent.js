@@ -82,7 +82,7 @@ const MapComponent = () => {
 
         const fetchData = async () => {
             try {
-                const response = await fetch("http://0.0.0.0:8000/geo/");
+                const response = await fetch("http://0.0.0.0:8001/geo/");
                 const data = await response.json();
 
                 source.clear();
