@@ -1,16 +1,12 @@
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from fastapi_utils.tasks import repeat_every
 
 from core.database import init_db
 from core.init_data_db import init_data
 from core.model_utils import update_cars_position_random
 from routers import cargo, cars, geo
-
-templates = Jinja2Templates(directory="templates")
 
 app = FastAPI(
     title="Delivery Service",
@@ -41,11 +37,6 @@ async def on_startup():
 @repeat_every(seconds=3 * 60, wait_first=True)
 async def update_data():
     await update_cars_position_random()
-
-
-# @app.get("/")
-# async def root(request: Request):
-#     return
 
 
 if __name__ == "__main__":
