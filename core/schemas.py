@@ -16,13 +16,16 @@ CarNumber = Annotated[
     Field(regex=r"^[1-9]\d{3}[A-Z]$", example="1234A", description="Номер автомобиля"),
 ]
 
+Lat = Annotated[float, Field(example="10.345", description="Широта")]
+Lng = Annotated[float, Field(example="10.345", description="Долгота")]
+
 
 class Location(BaseModel):
     zip: Zip
     city: str = Field(example="New York", description="Название города")
     state_name: str = Field(example="Texas", description="Название штата")
-    lat: float = Field(example="10.345", description="Широта")
-    lng: float = Field(example="10.345", description="Долгота")
+    lat: Lat
+    lng: Lng
 
     class Config:
         orm_mode = True
@@ -91,3 +94,20 @@ class CargoList(BaseModel):
 
 class CargoDelete(BaseModel):
     detail: str = Field(example="status")
+
+
+class CarLocation(BaseModel):
+    car_number: CarNumber
+    location: Location
+
+
+class CargoLocation(BaseModel):
+    id: int
+    pick_up: Location
+    delivery: Location
+    description: Description
+
+
+class GeoResponse(BaseModel):
+    cars: list[CarLocation]
+    cargo: list[CargoLocation]
