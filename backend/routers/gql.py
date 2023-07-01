@@ -39,7 +39,7 @@ class Cargo:
 @strawberry.type
 class Query:
     @strawberry.field
-    async def get_cars(self, info: Info) -> list[Car]:
+    async def cars(self, info: Info) -> list[Car]:
         return [
             Car.from_pydantic(schemas.CarFull.from_orm(c))
             for c in await get_all(info.context["db"], models.Car)
@@ -54,14 +54,14 @@ class Query:
         )
 
     @strawberry.field
-    async def get_cargo(self, info: Info) -> list[Cargo]:
+    async def cargo(self, info: Info) -> list[Cargo]:
         return [
             Cargo.from_pydantic(schemas.CargoFull.from_orm(c))
             for c in await get_all(info.context["db"], models.Cargo)
         ]
 
     @strawberry.field
-    async def get_location(self, info: Info, zip: schemas.Zip) -> Location | None:
+    async def location(self, info: Info, zip: schemas.Zip) -> Location | None:
         return Location.from_pydantic(
             schemas.Location.from_orm(await get_location(info.context["db"], zip))
         )

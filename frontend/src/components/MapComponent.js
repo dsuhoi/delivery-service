@@ -90,7 +90,7 @@ const MapComponent = () => {
         const fetchData = async () => {
             const GET_LOCATIONS = gql`
                 {
-                    cargo: getCargo {
+                    cargo {
                         id
                         description
                         pickUpLoc {
@@ -98,7 +98,7 @@ const MapComponent = () => {
                             lng
                         }
                     }
-                    cars: getCars {
+                    cars {
                         carNumber
                         loc {
                             lat
