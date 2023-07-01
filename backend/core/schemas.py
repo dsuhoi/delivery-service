@@ -2,6 +2,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
+# import core.models as models
+
 Zip = Annotated[
     int, Field(ge=0, le=99999, example="705", description="Zip код локации")
 ]
@@ -16,8 +18,8 @@ CarNumber = Annotated[
     Field(regex=r"^[1-9]\d{3}[A-Z]$", example="1234A", description="Номер автомобиля"),
 ]
 
-Lat = Annotated[float, Field(example="10.345", description="Широта")]
-Lng = Annotated[float, Field(example="10.345", description="Долгота")]
+Lat = Annotated[float, Field(example=10.345, description="Широта")]
+Lng = Annotated[float, Field(example=10.345, description="Долгота")]
 
 
 class Location(BaseModel):
@@ -36,6 +38,17 @@ class Car(BaseModel):
     car_number: CarNumber
     current_loc: Zip
     load_capacity: Weight
+
+
+class CarFull(BaseModel):
+    id: int
+    car_number: CarNumber
+    loc: Location
+    load_capacity: Weight
+
+    class Config:
+        populate_by_name = True
+        orm_mode = True
 
 
 class CarResponse(Car):
@@ -60,6 +73,17 @@ class Cargo(BaseModel):
     delivery: Zip
     weight: Weight
     description: Description
+
+
+class CargoFull(BaseModel):
+    id: int
+    pick_up_loc: Location
+    delivery_loc: Location
+    weight: Weight
+    description: Description
+
+    class Config:
+        orm_mode = True
 
 
 class CargoParams(Cargo):

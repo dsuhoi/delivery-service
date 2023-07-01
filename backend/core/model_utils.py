@@ -22,6 +22,10 @@ async def get_all(db: AsyncSession, model: Base):
     return (await db.scalars(select(model))).all()
 
 
+async def get_location(db: AsyncSession, zip: int):
+    return (await db.scalars(select(Location).where(Location.zip == zip))).first()
+
+
 async def update_cars_position_random():
     query = update(Car).values(
         current_loc=select(Location.zip).order_by(func.random() + Car.id).limit(1)

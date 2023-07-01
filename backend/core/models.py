@@ -52,7 +52,7 @@ class Car(Base):
     loc = sa.orm.relationship("Location", foreign_keys=[current_loc], lazy="selectin")
 
     def __str__(self):
-        return f"id={self.id} # car_number={self.car_number} # location={self.location}"
+        return f"id={self.id} # car_number={self.car_number} # location={self.loc}"
 
 
 class Location(Base):

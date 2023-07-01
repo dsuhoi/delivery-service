@@ -6,12 +6,12 @@ from fastapi_utils.tasks import repeat_every
 from core.database import init_db
 from core.init_data_db import init_data
 from core.model_utils import update_cars_position_random
-from routers import cargo, cars, geo
+from routers import cargo, cars, geo, gql
 
 app = FastAPI(
     title="Delivery Service",
     description="Сервис поиска ближайших машин для перевозки грузов",
-    version="1.0.1",
+    version="1.1.0",
     license_info={"name": "MIT License", "url": "https://mit-license.org/"},
 )
 
@@ -25,6 +25,7 @@ app.add_middleware(
 app.include_router(cargo.router)
 app.include_router(cars.router)
 app.include_router(geo.router)
+app.include_router(gql.router, prefix="/graphql")
 
 
 @app.on_event("startup")

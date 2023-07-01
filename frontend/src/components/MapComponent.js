@@ -12,6 +12,8 @@ import VectorSource from "ol/source/Vector";
 import VectorLayer from "ol/layer/Vector";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 import Overlay from "ol/Overlay";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+
 const MapComponent = () => {
     const mapRef = useRef(null);
     const popupRef = useRef(null);
@@ -80,18 +82,40 @@ const MapComponent = () => {
             }
         });
 
-        const fetchData = async () => {
-            try {
-                const response = await fetch("http://0.0.0.0:8001/geo/");
-                const data = await response.json();
+        const client = new ApolloClient({
+            uri: "http://0.0.0.0:8001/graphql",
+            cache: new InMemoryCache(),
+        });
 
+        const fetchData = async () => {
+            const GET_LOCATIONS = gql`
+                {
+                    cargo: getCargo {
+                        id
+                        description
+                        pickUpLoc {
+                            lat
+                            lng
+                        }
+                    }
+                    cars: getCars {
+                        carNumber
+                        loc {
+                            lat
+                            lng
+                        }
+                    }
+                }
+            `;
+            client.query({ query: GET_LOCATIONS }).then((response) => {
+                const data = response.data;
                 source.clear();
                 data.cars.forEach((item) => {
                     const marker = new Feature({
                         geometry: new Point(
-                            fromLonLat([item.location.lng, item.location.lat])
+                            fromLonLat([item.loc.lng, item.loc.lat])
                         ),
-                        name: item.car_number,
+                        name: item.carNumber,
                         description: "car",
                         color: "blue",
                     });
@@ -102,7 +126,7 @@ const MapComponent = () => {
                 data.cargo.forEach((item) => {
                     const marker = new Feature({
                         geometry: new Point(
-                            fromLonLat([item.pick_up.lng, item.pick_up.lat])
+                            fromLonLat([item.pickUpLoc.lng, item.pickUpLoc.lat])
                         ),
                         name: item.id,
                         description: item.description,
@@ -111,9 +135,7 @@ const MapComponent = () => {
                     marker.setStyle(markerStyleFunction(marker));
                     source.addFeature(marker);
                 });
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
+            });
         };
 
         fetchData();
