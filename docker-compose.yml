@@ -14,11 +14,19 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     env_file:
       - ./.env
+
+  redis:
+    image: redis:latest
+    expose:
+      - 6379
+    networks:
+      - transformer
+
   backend:
     build: ./backend
     command: uvicorn main:app  --host 0.0.0.0 --port 8000
     volumes:
-      - .:/app
+      - ./backend:/backend_app
     ports:
       - 8001:8000
     networks:
@@ -29,6 +37,32 @@ services:
       - ./.env
     depends_on:
       - db
+      - redis
+
+  worker:
+    build: ./backend
+    command: celery -A tasks.cars_task worker -l info
+    networks:
+      - transformer
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+      - backend
+
+  beat:
+    build: ./backend
+    command: celery -A tasks.cars_task beat -l info
+    networks:
+      - transformer
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+      - backend
+
   frontend:
     build: ./frontend
     ports:
@@ -37,6 +71,9 @@ services:
       - transformer
     env_file:
       - ./.env
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
 

@@ -8,6 +8,8 @@ from core.init_data_db import init_data
 from core.model_utils import update_cars_position_random
 from routers import cargo, cars, geo, gql
 
+# from tasks.cars_task import app as celery_app
+
 app = FastAPI(
     title="Delivery Service",
     description="Сервис поиска ближайших машин для перевозки грузов",
@@ -32,12 +34,6 @@ app.include_router(gql.router, prefix="/graphql")
 async def on_startup():
     await init_db()
     await init_data()
-
-
-@app.on_event("startup")
-@repeat_every(seconds=3 * 60, wait_first=True)
-async def update_data():
-    await update_cars_position_random()
 
 
 if __name__ == "__main__":

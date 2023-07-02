@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y libpq-dev netcat
 COPY *.py locations.csv pytest.ini requirements.txt ./
 COPY core/ ./core/
 COPY routers/ ./routers/
+COPY tasks/ ./tasks/
 COPY tests/ ./tests/
 
 RUN pip3 install -r requirements.txt
