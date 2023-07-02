@@ -67,6 +67,5 @@ class Query:
         )
 
 
-schema = strawberry.Schema(query=Query)
-
+schema = strawberry.Schema(query=Query, types=[Cargo, Car, Location])
 router = GraphQLRouter(schema, context_getter=get_context)

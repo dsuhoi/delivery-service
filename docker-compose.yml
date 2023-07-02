@@ -6,22 +6,16 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     expose:
       - ${DB_HOST}
-    networks:
-      - transformer
     environment:
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     env_file:
       - ./.env
-
   redis:
     image: redis:latest
     expose:
       - 6379
-    networks:
-      - transformer
-
   backend:
     build: ./backend
     command: uvicorn main:app  --host 0.0.0.0 --port 8000
@@ -29,8 +23,6 @@ services:
       - ./backend:/backend_app
     ports:
       - 8001:8000
-    networks:
-      - transformer
     environment:
       - DATABASE_URL=postgresql+asyncpg://${DB_USERNAME}:${DB_PASSWORD}@db:${DB_HOST}/${DB_DATABASE}
     env_file:
@@ -38,37 +30,24 @@ services:
     depends_on:
       - db
       - redis
-
   worker:
     build: ./backend
     command: celery -A tasks.cars_task worker -l info
-    networks:
-      - transformer
     env_file:
       - ./.env
     depends_on:
-      - db
-      - redis
       - backend
-
   beat:
     build: ./backend
     command: celery -A tasks.cars_task beat -l info
-    networks:
-      - transformer
     env_file:
       - ./.env
     depends_on:
-      - db
-      - redis
       - backend
-
   frontend:
     build: ./frontend
     ports:
       - 3001:3000
-    networks:
-      - transformer
     env_file:
       - ./.env
     depends_on:
@@ -76,7 +55,3 @@ services:
 
 volumes:
   postgres_data:
-
-networks:
-  transformer:
-    driver: bridge
