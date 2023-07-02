@@ -1,14 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_utils.tasks import repeat_every
 
 from core.database import init_db
 from core.init_data_db import init_data
-from core.model_utils import update_cars_position_random
 from routers import cargo, cars, geo, gql
-
-# from tasks.cars_task import app as celery_app
 
 app = FastAPI(
     title="Delivery Service",

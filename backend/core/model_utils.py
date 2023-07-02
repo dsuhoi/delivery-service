@@ -37,6 +37,8 @@ async def update_cars_position_random():
 async def create_model(db: AsyncSession, model: Base):
     db.add(model)
     await db.commit()
+    await db.refresh(model)
+    return model
 
 
 async def delete_model(db: AsyncSession, model: Base):
