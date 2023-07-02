@@ -15,7 +15,7 @@ async def get_id_cargo(cargo_id: int, db: AsyncSession = Depends(get_session)):
     if cargo_db := await get_by_id(db, models.Cargo, cargo_id):
         return cargo_db
     else:
-        raise HTTPException(status_code=404, detail="There is no cargo for such id")
+        raise HTTPException(status_code=404, detail="There is no cargo for such id.")
 
 
 @router.post("/", response_model=schemas.CargoResponse, description="Создание груза.")
@@ -50,14 +50,12 @@ async def list_cargo(
     db: AsyncSession = Depends(get_session),
 ):
     cg_list = await get_all(db, models.Cargo)
-
     if weight:
         if weight >= 0:
             comp = lambda x: x > weight
         else:
             comp = lambda x: x < -weight
         cg_list = [cargo for cargo in cg_list if comp(cargo.weight)]
-
     cars_list = await get_all(db, models.Car)
     response = []
     for cargo in cg_list:

@@ -47,7 +47,6 @@ class CarFull(BaseModel):
     load_capacity: Weight
 
     class Config:
-        populate_by_name = True
         orm_mode = True
 
 
@@ -112,9 +111,6 @@ class CargoList(BaseModel):
     delivery: Zip
     count_cars_nerby: int = Field(example="10", description="Количество машин рядом")
 
-    class Config:
-        orm_mode = True
-
 
 class CargoDelete(BaseModel):
     detail: str = Field(example="status")
@@ -122,14 +118,20 @@ class CargoDelete(BaseModel):
 
 class CarLocation(BaseModel):
     car_number: CarNumber
-    location: Location
+    loc: Location
+
+    class Config:
+        orm_mode = True
 
 
 class CargoLocation(BaseModel):
     id: int
-    pick_up: Location
-    delivery: Location
+    pick_up_loc: Location
+    delivery_loc: Location
     description: Description
+
+    class Config:
+        orm_mode = True
 
 
 class GeoResponse(BaseModel):
