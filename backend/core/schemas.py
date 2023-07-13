@@ -15,7 +15,9 @@ Description = Annotated[
 
 CarNumber = Annotated[
     str,
-    Field(regex=r"^[1-9]\d{3}[A-Z]$", example="1234A", description="Номер автомобиля"),
+    Field(
+        pattern=r"^[1-9]\d{3}[A-Z]$", example="1234A", description="Номер автомобиля"
+    ),
 ]
 
 Lat = Annotated[float, Field(example=10.345, description="Широта")]
@@ -30,7 +32,7 @@ class Location(BaseModel):
     lng: Lng
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Car(BaseModel):
@@ -47,12 +49,12 @@ class CarFull(BaseModel):
     load_capacity: Weight
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CarResponse(Car):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CarPatch(BaseModel):
@@ -82,7 +84,7 @@ class CargoFull(BaseModel):
     description: Description
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CargoParams(Cargo):
@@ -93,7 +95,7 @@ class CargoResponse(Cargo):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CargoGet(CargoResponse):
@@ -121,7 +123,7 @@ class CarLocation(BaseModel):
     loc: Location
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CargoLocation(BaseModel):
@@ -131,7 +133,7 @@ class CargoLocation(BaseModel):
     description: Description
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GeoResponse(BaseModel):
