@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from geoalchemy2 import WKBElement
+from geoalchemy2.shape import to_shape
+from pydantic import BaseModel, Field, SkipValidation
+from shapely import Point
 
 # import core.models as models
 
-Zip = Annotated[
-    int, Field(ge=0, le=99999, example="705", description="Zip код локации")
-]
+Zip = Annotated[int, Field(ge=0, le=99999, example=705, description="Zip код локации")]
 
 Weight = Annotated[int, Field(ge=1, le=1000, example=123, description="Вес груза")]
 Description = Annotated[
@@ -15,11 +16,17 @@ Description = Annotated[
 
 CarNumber = Annotated[
     str,
-    Field(regex=r"^[1-9]\d{3}[A-Z]$", example="1234A", description="Номер автомобиля"),
+    Field(
+        pattern=r"^[1-9]\d{3}[A-Z]$", example="1234A", description="Номер автомобиля"
+    ),
 ]
 
 Lat = Annotated[float, Field(example=10.345, description="Широта")]
 Lng = Annotated[float, Field(example=10.345, description="Долгота")]
+
+
+def ewkb_to_wkt(geom: WKBElement):
+    return to_shape(geom).wkt
 
 
 class Location(BaseModel):
@@ -29,8 +36,12 @@ class Location(BaseModel):
     lat: Lat
     lng: Lng
 
+    @staticmethod
+    def from_orm(base):
+        pass
+
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class Car(BaseModel):
@@ -47,12 +58,12 @@ class CarFull(BaseModel):
     load_capacity: Weight
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CarResponse(Car):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CarPatch(BaseModel):
@@ -82,7 +93,7 @@ class CargoFull(BaseModel):
     description: Description
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CargoParams(Cargo):
@@ -93,7 +104,7 @@ class CargoResponse(Cargo):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CargoGet(CargoResponse):
@@ -109,7 +120,7 @@ class CargoList(BaseModel):
     id: int
     pick_up: Zip
     delivery: Zip
-    count_cars_nerby: int = Field(example="10", description="Количество машин рядом")
+    count_cars_nerby: int = Field(example=10, description="Количество машин рядом")
 
 
 class CargoDelete(BaseModel):
@@ -121,7 +132,7 @@ class CarLocation(BaseModel):
     loc: Location
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CargoLocation(BaseModel):
@@ -131,7 +142,7 @@ class CargoLocation(BaseModel):
     description: Description
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GeoResponse(BaseModel):

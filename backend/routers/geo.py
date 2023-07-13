@@ -8,24 +8,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix="/geo", tags=["geo"])
 
 
-@router.get("/location/{zip}", description="Получение локации по zip коду.")
-async def get_location(zip: int, db: AsyncSession = Depends(get_session)):
+@router.get(
+    "/location/{zip}",
+    response_model=schemas.Location,
+    description="Получение локации по zip коду.",
+)
+async def get_location(
+    zip: int, db: AsyncSession = Depends(get_session)
+) -> schemas.Location:
     if loc := await model_utils.get_location(db, zip):
-        return schemas.Location.from_orm(loc)
+        return loc
     else:
         raise HTTPException(
             status_code=404, detail="There is no location for such zip."
         )
 
 
-@router.get("/", description="Получение всех данных о местоположении объектов.")
-async def get_geo(db: AsyncSession = Depends(get_session)):
+@router.get(
+    "/",
+    response_model=schemas.GeoResponse,
+    description="Получение всех данных о местоположении объектов.",
+)
+async def get_geo(db: AsyncSession = Depends(get_session)) -> schemas.GeoResponse:
     cargo = [
-        schemas.CargoLocation.from_orm(cg)
+        schemas.CargoLocation.parse_obj(cg)
         for cg in await model_utils.get_all(db, models.Cargo)
     ]
     cars = [
-        schemas.CarLocation.from_orm(car)
+        schemas.CarLocation.parse_obj(car)
         for car in await model_utils.get_all(db, models.Car)
     ]
     return schemas.GeoResponse(cargo=cargo, cars=cars)

@@ -3,14 +3,16 @@ FROM python:3.10-slim
 WORKDIR /backend_app
 
 RUN apt-get update && apt-get install -y libpq-dev netcat
+RUN pip3 install poetry
 
-COPY *.py locations.csv pytest.ini requirements.txt ./
+COPY *.py locations.csv pytest.ini poetry.lock pyproject.toml ./
 COPY core/ ./core/
 COPY routers/ ./routers/
 COPY tasks/ ./tasks/
 COPY tests/ ./tests/
 
-RUN pip3 install -r requirements.txt
+RUN poetry config virtualenvs.create false \
+&& poetry install --no-interaction --no-ansi
 
 COPY entrypoint.sh .
 RUN sed -i 's/\r$//g' entrypoint.sh

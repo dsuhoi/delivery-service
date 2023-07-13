@@ -1,7 +1,9 @@
 import random
 
+import geoalchemy2 as gsa
 import sqlalchemy as sa
 from geopy.distance import distance as geodist
+from shapely.geometry import Point
 
 from .database import Base
 
@@ -61,15 +63,27 @@ class Location(Base):
     zip = sa.Column(sa.Integer, unique=True, index=True, nullable=False)
     city = sa.Column(sa.String(32), nullable=False)
     state_name = sa.Column(sa.Text, nullable=False)
-    lat = sa.Column(sa.Float, nullable=False)
-    lng = sa.Column(sa.Float, nullable=False)
+    geom = sa.Column(gsa.Geometry(geometry_type="POINT", srid=4326), nullable=False)
+
+    def __init__(self, *args, lat: float, lng: float, **kwargs):
+        self.geom = gsa.shape.from_shape(Point(lat, lng), srid=4326)
+        super().__init__(*args, **kwargs)
+
+    @property
+    def lat(self):
+        return self.coords[0]
+
+    @property
+    def lng(self):
+        return self.coords[1]
 
     @property
     def coords(self) -> (float, float):
-        return (self.lat, self.lng)
+        coord = gsa.shape.to_shape(self.geom)
+        return coord.x, coord.y
 
     def distance(self, loc: "Location") -> float:
-        return round(geodist(self.coords, loc.coords).miles, 4)
+        return round(geodist(self.coords, loc.coords).km, 4)
 
     def __str__(self):
         return f"zip[{self.lat}, {self.lng}]: {self.zip} # {self.city}"
