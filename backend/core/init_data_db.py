@@ -11,7 +11,7 @@ from .models import Car, Location
 
 async def init_locations(db: AsyncSession) -> list[int]:
     loc_df = pd.read_csv("locations.csv")
-    db.add_all([Location(**loc) for loc in loc_df.to_dict("index").values()])
+    db.add_all([Location.from_dict(loc) for loc in loc_df.to_dict("index").values()])
     await db.commit()
     return loc_df["zip"].to_list()
 

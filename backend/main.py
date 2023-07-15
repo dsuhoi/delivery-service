@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 
 from core.database import init_db
 from core.init_data_db import init_data
-from routers import cargo, cars, geo, gql
+from routers import cargo, cars, geo  # , gql
 
 app = FastAPI(
     title="Delivery Service",
@@ -24,7 +24,7 @@ app.add_middleware(
 app.include_router(cargo.router)
 app.include_router(cars.router)
 app.include_router(geo.router)
-app.include_router(gql.router, prefix="/graphql")
+# app.include_router(gql.router, prefix="/graphql")
 
 
 @app.on_event("startup")

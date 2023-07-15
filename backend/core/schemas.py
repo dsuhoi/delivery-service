@@ -1,6 +1,9 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from geoalchemy2 import WKBElement
+from geoalchemy2.shape import to_shape
+from pydantic import BaseModel, Field, SkipValidation
+from shapely import Point
 
 # import core.models as models
 
@@ -24,12 +27,21 @@ Lat = Annotated[float, Field(example=10.345, description="Широта")]
 Lng = Annotated[float, Field(example=10.345, description="Долгота")]
 
 
+def ewkb_to_wkt(geom: WKBElement):
+    return to_shape(geom).wkt
+
+
 class Location(BaseModel):
     zip: Zip
     city: str = Field(example="New York", description="Название города")
     state_name: str = Field(example="Texas", description="Название штата")
-    lat: Lat
-    lng: Lng
+    geo: str
+    # lat: Lat
+    # lng: Lng
+
+    @staticmethod
+    def from_orm(base):
+        pass
 
     class Config:
         from_attributes = True

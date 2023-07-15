@@ -8,10 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = APIRouter(prefix="/geo", tags=["geo"])
 
 
-@router.get("/location/{zip}", description="Получение локации по zip коду.")
+@router.get(
+    "/location/{zip}",
+    response_model=schemas.Location,
+    description="Получение локации по zip коду.",
+)
 async def get_location(zip: int, db: AsyncSession = Depends(get_session)):
     if loc := await model_utils.get_location(db, zip):
-        return schemas.Location.from_orm(loc)
+        return schemas.Location.parse_obj(loc.to_dict())
     else:
         raise HTTPException(
             status_code=404, detail="There is no location for such zip."
