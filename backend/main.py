@@ -10,7 +10,7 @@ from routers import cargo, cars, geo, gql
 app = FastAPI(
     title="Delivery Service",
     description="Сервис поиска ближайших машин для перевозки грузов",
-    version="1.1.0",
+    version="1.2.0",
     license_info={"name": "MIT License", "url": "https://mit-license.org/"},
 )
 

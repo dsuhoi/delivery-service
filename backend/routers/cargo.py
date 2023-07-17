@@ -2,9 +2,11 @@ from typing import Annotated
 
 import core.models as models
 import core.schemas as schemas
+import sqlalchemy as sa
 from core.database import get_session
 from core.model_utils import (create_model, delete_model, get_all, get_by_id,
-                              get_zip_codes)
+                              get_cargo_with_count_cars, get_zip_codes)
+from core.models import Car, Cargo, Location
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,37 +43,15 @@ async def list_cargo(
     weight: Annotated[
         int | None,
         Query(
-            description="Фильтр по весу груза (отрицательное значение указывает на грузы меньше указанного веса)",
+            description="Фильтр по весу груза",
         ),
-    ] = None,
+    ] = 0,
     distance: Annotated[
-        float | None, Query(example=450.0, description="Фильтр по дистанции (мили)")
+        float | None, Query(example=450.0, description="Фильтр по дистанции (км)")
     ] = 450,
     db: AsyncSession = Depends(get_session),
 ):
-    cg_list = await get_all(db, models.Cargo)
-    if weight:
-        if weight >= 0:
-            comp = lambda x: x > weight
-        else:
-            comp = lambda x: x < -weight
-        cg_list = [cargo for cargo in cg_list if comp(cargo.weight)]
-    cars_list = await get_all(db, models.Car)
-    response = []
-    for cargo in cg_list:
-        count_cars_nerby = 0
-        for car in cars_list:
-            if cargo.pick_up_loc.distance(car.loc) <= distance:
-                count_cars_nerby += 1
-        response.append(
-            schemas.CargoList(
-                id=cargo.id,
-                pick_up=cargo.pick_up,
-                delivery=cargo.delivery,
-                count_cars_nerby=count_cars_nerby,
-            )
-        )
-    return response
+    return await get_cargo_with_count_cars(db, distance, weight)
 
 
 @router.get(

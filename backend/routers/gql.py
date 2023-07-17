@@ -13,26 +13,37 @@ async def get_context(db: AsyncSession = Depends(get_session)):
     return {"db": db}
 
 
-@strawberry.experimental.pydantic.type(model=schemas.Location)
+def from_pydantic(cls, model):
+    """Legacy code to fix bugs with pydantic v2.x.x"""
+    return cls(**model.model_dump())
+
+
+# @strawberry.experimental.pydantic.type(model=schemas.Location)
+@strawberry.type
 class Location:
-    zip: strawberry.auto
-    city: strawberry.auto
-    state_name: strawberry.auto
+    zip: schemas.Zip  # strawberry.auto
+    city: str  # strawberry.auto
+    state_name: str  # strawberry.auto
     lat: float
     lng: float
 
 
-@strawberry.experimental.pydantic.type(model=schemas.CarFull, all_fields=True)
+# @strawberry.experimental.pydantic.type(model=schemas.CarFull, all_fields=True)
+@strawberry.type
 class Car:
-    pass
+    id: int
+    car_number: schemas.CarNumber
+    loc: Location
+    load_capacity: schemas.Weight
 
 
-@strawberry.experimental.pydantic.type(model=schemas.CargoFull)
+# @strawberry.experimental.pydantic.type(model=schemas.CargoFull)
+@strawberry.type
 class Cargo:
-    id: strawberry.auto
-    pick_up_loc: strawberry.auto
-    delivery_loc: strawberry.auto
-    weight: strawberry.auto
+    id: int  # strawberry.auto
+    pick_up_loc: Location  # strawberry.auto
+    delivery_loc: Location  # strawberry.auto
+    weight: schemas.Weight  # strawberry.auto
     description: str
 
 
@@ -41,30 +52,26 @@ class Query:
     @strawberry.field
     async def cars(self, info: Info) -> list[Car]:
         return [
-            Car.from_pydantic(schemas.CarFull.from_orm(c))
+            schemas.CarFull.parse_obj(c)
             for c in await get_all(info.context["db"], models.Car)
         ]
 
     @strawberry.field
     async def get_car(self, info: Info, id: int) -> Car | None:
-        return Car.from_pydantic(
-            schemas.CarFull.from_orm(
-                await get_by_id(info.context["db"], models.Car, id=id)
-            )
+        return schemas.CarFull.parse_obj(
+            await get_by_id(info.context["db"], models.Car, id=id)
         )
 
     @strawberry.field
     async def cargo(self, info: Info) -> list[Cargo]:
         return [
-            Cargo.from_pydantic(schemas.CargoFull.from_orm(c))
+            schemas.CargoFull.parse_obj(c)
             for c in await get_all(info.context["db"], models.Cargo)
         ]
 
     @strawberry.field
     async def location(self, info: Info, zip: schemas.Zip) -> Location | None:
-        return Location.from_pydantic(
-            schemas.Location.from_orm(await get_location(info.context["db"], zip))
-        )
+        return schemas.Location.parse_obj(await get_location(info.context["db"], zip))
 
 
 schema = strawberry.Schema(query=Query, types=[Cargo, Car, Location])

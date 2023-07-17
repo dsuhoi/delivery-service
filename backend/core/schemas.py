@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from geoalchemy2 import WKBElement
+from geoalchemy2.shape import to_shape
+from pydantic import BaseModel, Field, SkipValidation
+from shapely import Point
 
 # import core.models as models
 
-Zip = Annotated[
-    int, Field(ge=0, le=99999, example="705", description="Zip код локации")
-]
+Zip = Annotated[int, Field(ge=0, le=99999, example=705, description="Zip код локации")]
 
 Weight = Annotated[int, Field(ge=1, le=1000, example=123, description="Вес груза")]
 Description = Annotated[
@@ -24,12 +25,20 @@ Lat = Annotated[float, Field(example=10.345, description="Широта")]
 Lng = Annotated[float, Field(example=10.345, description="Долгота")]
 
 
+def ewkb_to_wkt(geom: WKBElement):
+    return to_shape(geom).wkt
+
+
 class Location(BaseModel):
     zip: Zip
     city: str = Field(example="New York", description="Название города")
     state_name: str = Field(example="Texas", description="Название штата")
     lat: Lat
     lng: Lng
+
+    @staticmethod
+    def from_orm(base):
+        pass
 
     class Config:
         from_attributes = True
@@ -111,7 +120,7 @@ class CargoList(BaseModel):
     id: int
     pick_up: Zip
     delivery: Zip
-    count_cars_nerby: int = Field(example="10", description="Количество машин рядом")
+    count_cars_nerby: int = Field(example=10, description="Количество машин рядом")
 
 
 class CargoDelete(BaseModel):

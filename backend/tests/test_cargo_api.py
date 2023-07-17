@@ -5,7 +5,7 @@ async def test_list_cargo(ac, create_data):
     response = await ac.get("cargo/", params={"distance": 450})
     assert response.status_code == 200
     assert response.json()[0] == {
-        "count_cars_nerby": 3,
+        "count_cars_nerby": 2,
         "delivery": 58045,
         "id": 1,
         "pick_up": 12933,
