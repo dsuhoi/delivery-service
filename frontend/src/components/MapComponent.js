@@ -67,7 +67,7 @@ const MapComponent = () => {
         map.on("pointermove", (event) => {
             const feature = map.forEachFeatureAtPixel(
                 event.pixel,
-                (feature) => feature
+                (feature) => feature,
             );
             if (feature) {
                 const coordinate = event.coordinate;
@@ -83,7 +83,7 @@ const MapComponent = () => {
         });
 
         const client = new ApolloClient({
-            uri: "http://0.0.0.0:8001/graphql",
+            uri: "/api/graphql",
             cache: new InMemoryCache(),
         });
 
@@ -113,7 +113,7 @@ const MapComponent = () => {
                 data.cars.forEach((item) => {
                     const marker = new Feature({
                         geometry: new Point(
-                            fromLonLat([item.loc.lng, item.loc.lat])
+                            fromLonLat([item.loc.lng, item.loc.lat]),
                         ),
                         name: item.carNumber,
                         description: "car",
@@ -126,7 +126,10 @@ const MapComponent = () => {
                 data.cargo.forEach((item) => {
                     const marker = new Feature({
                         geometry: new Point(
-                            fromLonLat([item.pickUpLoc.lng, item.pickUpLoc.lat])
+                            fromLonLat([
+                                item.pickUpLoc.lng,
+                                item.pickUpLoc.lat,
+                            ]),
                         ),
                         name: item.id,
                         description: item.description,
