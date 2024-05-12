@@ -6,7 +6,7 @@
 ### Установка
 В корневой директории  выполните команду:
 ```sh
-docker compose up -d --built
+docker compose up -d --build
 ```
 
 ### Просмотр

@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 WORKDIR /backend_app
 
-RUN apt-get update && apt-get install -y libpq-dev netcat
+RUN apt-get update && apt-get install -y libpq-dev netcat-traditional
 RUN pip3 install poetry
 
 COPY . .
